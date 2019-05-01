@@ -13,7 +13,7 @@ This document details how to install and use this integration.
 ---------
 # Pre-Requisites
 * An application deployed in kubernetes broken up into microservices (via docker); see [here](https://istio.io/docs/examples/bookinfo/) for a basic example
-* A communication plan - you can use [this example](./KialiExample.zip) plan to start
+* A communication plan, and access to names of microservices from a script - could be applicable to a stackdriver integration, adding the service name into the xmatters inbound, then getting the service's relations when notifying someone
 * xMatters account - If you don't have one, [get one](https://www.xmatters.com)! 
 
 # Files
