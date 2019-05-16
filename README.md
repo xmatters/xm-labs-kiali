@@ -1,6 +1,6 @@
 # Istio - Kiali <--> xMatters integration
 This is part of the xMatters Labs awesome listing. For others, see [here](https://github.com/xmatters/xMatters-Labs)
-With this Outbound Integration, notification recipients can quickly continue a pipeline that requires a user response to do something via Spinnaker
+With this library, notification recipients can quickly see how the microservices of their application are related in order to more efficiently fix errors.
 
 This document details how to install and use this integration. 
 
