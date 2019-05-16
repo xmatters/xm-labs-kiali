@@ -165,6 +165,7 @@ kiali.getAll('namespace');
 kiali.getAll(['namespace1', 'namespace2', 'namespace3'], 10, 10);
 ```
 * example output:
+
 ![all-output](./media/all-output.png)
 
 ### getServiceRelations
@@ -186,6 +187,7 @@ kiali.getServiceRelations('service', 'namespace', 3, 3);
 kiali.getServiceRelations('service', ['namespace1', 'namespace2', 'namespace3']);
 ```
 * example output:
+
 ![service-relations-output](./media/service-relations-output.png)
 
 
@@ -202,6 +204,7 @@ kiali = require('kiali');
 kiali.getServiceDetails('service', 'namespace');
 ```
 * example output:
+
 ![service-details-output](./media/service-details-output.png)
 
 ### getHtml
@@ -218,6 +221,7 @@ kiali.getHtml('namespace');
 kiali.getHtml(['namespace1', 'namespace2', 'namespace3'])
 ```
 * example output:
+
 ![html-output](./media/html-output.png)
 
 ### getJson
