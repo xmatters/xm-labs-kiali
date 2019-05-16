@@ -164,8 +164,7 @@ kiali.getAll('namespace');
 // to get services for multiple namespaces
 kiali.getAll(['namespace1', 'namespace2', 'namespace3'], 10, 10);
 ```
-* example output:
-
+* example output:&nbsp;
 ![all-output](./media/all-output.png)
 
 ### getServiceRelations
@@ -186,8 +185,7 @@ kiali.getServiceRelations('service', 'namespace', 3, 3);
 // to get the relations of a service for multiple namespaces
 kiali.getServiceRelations('service', ['namespace1', 'namespace2', 'namespace3']);
 ```
-* example output:
-
+* example output:&nbsp;
 ![service-relations-output](./media/service-relations-output.png)
 
 
@@ -203,9 +201,7 @@ kiali = require('kiali');
 // to get the details of a service
 kiali.getServiceDetails('service', 'namespace');
 ```
-* example output:
-
-![service-details-output](./media/service-details-output.png)
+* example output: [see here](https://www.kiali.io/api/#operation/serviceDetails)
 
 ### getHtml
 * Gets the Kiali graph as an HTML table with a row for each service, with a column containing a list of parent services, and a column containing a list of children services
@@ -220,8 +216,7 @@ kiali.getHtml('namespace');
 // to get the html for multiple namespaces
 kiali.getHtml(['namespace1', 'namespace2', 'namespace3'])
 ```
-* example output:
-
+* example output:&nbsp;
 ![html-output](./media/html-output.png)
 
 ### getJson
