@@ -16,7 +16,7 @@
  * 
  * getAll:
  * Gets all services for a namespace, showing each services parents and children
- * param namespaces: Single namespace (String) or list of namespaces to request a graph for
+ * param namespaces: Single namespace (String) or list (Array) of namespaces to request a graph for
  * param nparents: Number of parents to display (default=1)
  * param nchildren: Number of children to display (default=1)
  * return: Returns a list (string) of each service and their parents and children
@@ -24,32 +24,32 @@
  *
  * getServiceRelations:
  * Gets the parents and children for a given service in a namespace
- * param namespaces: Single namespace (String) or list of namespaces to request a graph for
+ * param namespaces: Single namespace (String) or list (Array) of namespaces to request a graph for
  * param service: Name of the service to get
  * param nparents: Number of parents to display (default=all)
  * param nchildren: Number of children to display (default=all)
- * return: Returns a string showing all (or nparents & nchildren) the services parents and children
+ * return: Returns a string showing all (or nparents & nchildren) the service's parents and children
  ***** kialiParser.getServiceRelations = function(namespaces, service, nparents=null, nchildren=null)
  *
  * getServiceDetails:
  * Gets the details for the given service, see example output at https://www.kiali.io/api/#operation/serviceDetails
- * param namespaces: Single namespace (String) or list of namespaces to request a graph for
+ * param namespaces: Single namespace to look for the service inside
  * param service: Name of the service to get
- * return: Returns the json of the service details, from https://www.kiali.io/api/#operation/serviceDetails
+ * return: Returns the json of the service details
  ***** kialiParser.getServiceDetails = function(namespaces, service)
  *
  * getHtml:
  * Gets the Kiali graph as an HTML table with a row for each service, with a column
  * containing a list of parent services, and a column containing a list of children services
- * param namespaces: List of (kubernetes) namespaces to request a graph for
- * return: Returns the html of all services as a table (or list? Maybe eventually graph?)
+ * param namespaces: Single namespace (String) or list (Array) of namespaces to request a graph for
+ * return: Returns the html of all services as a table
  *
  ***** kialiParser.getHtml = function(namespaces)
  *
  * getJson:
  * Gets the JSON representation of a service graph
- * param namespaces: List of (kubernetes) namespaces to request a graph for
- * return: Returns the json of the Kiali graph
+ * param namespaces: Single namespace (String) or list (Array) of namespaces to request a graph for
+ * return: Returns the json (as a JavaScript Object) of the Kiali graph
  *
  ***** kialiParser.getJson = function(namespaces)
  *
@@ -63,9 +63,9 @@
 
 /*
  * Gets all services for a namespace, showing each services parents and children
- * param namespaces: Single namespace (String) or list of namespaces to request a graph for
- * param nparents: Number of parents to display (default=1), set to null to get all parents
- * param nchildren: Number of children to display (default=1), set to null to get all children
+ * param namespaces: Single namespace (String) or list (Array) of namespaces to request a graph for
+ * param nparents: Number of parents to display (default=1)
+ * param nchildren: Number of children to display (default=1)
  * return: Returns a list (string) of each service and their parents and children
  */
 exports.getAll = function(namespaces, nparents, nchildren) {
@@ -77,10 +77,11 @@ exports.getAll = function(namespaces, nparents, nchildren) {
     for (var key in nodes) {
         var node = nodes[key];
         var parentsOut = parentsToString(nodes, node, nparents);
+        var childrenOut;
         if (!parentsOut) {
-            var childrenOut = childrenToString(nodes, node, 0, nchildren);
+            childrenOut = childrenToString(nodes, node, 0, nchildren);
         } else {
-            var childrenOut = childrenToString(nodes, node, parentsOut[0], nchildren);
+            childrenOut = childrenToString(nodes, node, parentsOut[0], nchildren);
         }
         message += node.name + ":\n";
         if (!parentsOut) {
@@ -110,7 +111,7 @@ var parentsToString = function(nodes, node, nparents) {
     if (!node.parents || node.parents.length === 0) {
         return null;
     }
-    var nparents = nparents ? nparents : 9007199254740991;
+    var nparents = nparents ? nparents : 1;
     var parents = [];
     var currentParents = [];
     // Push first generation of parents
@@ -180,7 +181,7 @@ var childrenToString = function(nodes, node, ntabs, nchildren) {
     if (!node.children || node.children.length === 0) {
         return null;
     }
-    var nchildren = nchildren ? nchildren : 9007199254740991;
+    var nchildren = nchildren ? nchildren : 1;
     prefix = "";
     for (var i = 0; i < ntabs; i ++) {
         prefix += "..";
@@ -245,15 +246,15 @@ var childrenToString = function(nodes, node, ntabs, nchildren) {
 
 /*
  * Gets the parents and children for a given service in a namespace
- * param namespaces: Single namespace (String) or list of namespaces to request a graph for
+ * param namespaces: Single namespace (String) or list (Array) of namespaces to request a graph for
  * param service: Name of the service to get
- * param nparents: Number of parents to display (set to null for all)
- * param nchildren: Number of children to display (set to null for all)
- * return: Returns a string showing all (or nparents & nchildren) the services parents and children
+ * param nparents: Number of generations of parents to display (default=1)
+ * param nchildren: Number of generations of children to display (default=1)
+ * return: Returns a string showing all (or nparents & nchildren) the service's parents and children
  */
 exports.getServiceRelations = function(namespaces, service, nparents, nchildren) {
-    var nparents = nparents ? nparents : 9007199254740991;
-    var nchildren = nchildren ? nchildren : 9007199254740991;
+    var nparents = nparents ? nparents : 1;
+    var nchildren = nchildren ? nchildren : 1;
     var elements = exports.getJson(namespaces).elements;
     var nodes = parseJson(elements);
     var nameToId = {};
@@ -269,30 +270,21 @@ exports.getServiceRelations = function(namespaces, service, nparents, nchildren)
     }
     message = ""
     var parentsOut = parentsToString(nodes, serviceNode, nparents);
+    var childrenOut;
     if (!parentsOut) {
-        var childrenOut = childrenToString(nodes, serviceNode, 0, nchildren);
+        childrenOut = childrenToString(nodes, serviceNode, 0, nchildren);
     } else {
-        var childrenOut = childrenToString(nodes, serviceNode, 0, nchildren);
+        childrenOut = childrenToString(nodes, serviceNode, parentsOut[0], nchildren);
     }
     message += serviceNode.name + ":\n";
     if (!parentsOut) {
         message += "No Parents...\n";
     } else {
         message += parentsOut[1];
-        for (var i = 0; i < parentsOut[0]; i ++) {
-            message += "\t";
-        }
     }
     message += "<--[" + serviceNode.name + "]-->\n";
     if (!childrenOut) {
-        if (!parentsOut) {
-            message += "No Children...\n";
-        } else {
-            for (var i = 0; i < parentsOut[0]; i ++) {
-                message += "\t";
-            }
-            message += "No Children...\n";
-        }
+        message += "No Children...\n"
     } else {
         message += childrenOut[1];
     }
@@ -303,9 +295,9 @@ exports.getServiceRelations = function(namespaces, service, nparents, nchildren)
 
 /*
  * Gets the details for the given service, see example output at https://www.kiali.io/api/#operation/serviceDetails
- * param namespaces: Single namespace (String) or list of namespaces to request a graph for
+ * param namespaces: Single namespace (String) or list (Array) of namespaces to request a graph for
  * param service: Name of the service to get
- * return: Returns the json of the service details, from https://www.kiali.io/api/#operation/serviceDetails
+ * return: Returns the json of the service details
  */
 exports.getServiceDetails = function(namespaces, service) {
     var pathStr = "";
@@ -338,8 +330,8 @@ exports.getServiceDetails = function(namespaces, service) {
 /*
  * Gets the Kiali graph as an HTML table with a row for each service, with a column
  * containing a list of parent services, and a column containing a list of children services
- * param namespaces: List of (kubernetes) namespaces to request a graph for
- * return: Returns the html of all services as a table (or list? Maybe eventually graph?)
+ * param namespaces: Single namespace (String) or list (Array) of namespaces to request a graph for
+ * return: Returns the html of all services as a table
  */
 exports.getHtml = function(namespaces) {
     var elements = exports.getJson(namespaces).elements;
@@ -395,8 +387,8 @@ exports.getHtml = function(namespaces) {
 
 /*
  * Gets the JSON representation of a service graph
- * param namespaces: List of (kubernetes) namespaces to request a graph for
- * return: Returns the json of the Kiali graph
+ * param namespaces: Single namespace (String) or list (Array) of namespaces to request a graph for
+ * return: Returns the json (as a JavaScript Object) of the Kiali graph
  */
 exports.getJson = function(namespaces) {
     var pathStr = "";
@@ -412,7 +404,7 @@ exports.getJson = function(namespaces) {
     }
     var getKialiRequest = http.request({
         'endpoint': 'Kiali',
-        'path': 'kiali/api/namespaces/graph?namespaces=' + pathStr,
+        'path': 'kiali/api/namespaces/graph?namespaces=' + pathStr + '&graphType=service',
         'method': 'GET'
     });
     response = getKialiRequest.write();
@@ -425,7 +417,10 @@ exports.getJson = function(namespaces) {
 };
 
 
-
+/*
+ * Gets the Link to the Kiali graph
+ * return: The link (as a string) to the Kiali graph
+ */
 exports.getLink = function() {
     return constants['Kiali Endpoint'] + 'kiali/console/graph/namespaces?graphType=workload';
 }
@@ -447,7 +442,7 @@ var parseJson = function(elements) {
         name = node.data.service ? node.data.service : node.data.app ? node.data.app : node.data.workload ? node.data.workload : 'unknown'
         if (!idToName[node.data.id]) {
             idToName[node.data.id] = name;
-            nodes[name] = {'name': name, 'parents': new Set(), 'children': new Set()};
+            nodes[name] = {'name': name, 'parents': [], 'children': []};
         }
     }
     for (i = 0; i < elements.edges.length; i ++) {
@@ -455,8 +450,14 @@ var parseJson = function(elements) {
         if (idToName[edge.data.source] === idToName[edge.data.target]) {
             continue;
         }
-        nodes[idToName[edge.data.source]].children.add(idToName[edge.data.target]);
-        nodes[idToName[edge.data.target]].parents.add(idToName[edge.data.source]);
+        var sourceName = idToName[edge.data.source];
+        var targetName = idToName[edge.data.target];
+        if (nodes[sourceName].children.indexOf(targetName) === -1) {
+            nodes[sourceName].children.push(targetName);
+        }
+        if (nodes[targetName].parents.indexOf(sourceName) === -1) {
+            nodes[targetName].parents.push(sourceName);
+        }
     }
     return nodes;
 };
