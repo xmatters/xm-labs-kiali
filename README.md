@@ -164,7 +164,7 @@ kiali.getAll('namespace');
 // to get services for multiple namespaces
 kiali.getAll(['namespace1', 'namespace2', 'namespace3'], 10, 10);
 ```
-* example output:&nbsp;
+* example output:  
 ![all-output](./media/all-output.png)
 
 ### getServiceRelations
@@ -185,7 +185,7 @@ kiali.getServiceRelations('service', 'namespace', 3, 3);
 // to get the relations of a service for multiple namespaces
 kiali.getServiceRelations('service', ['namespace1', 'namespace2', 'namespace3']);
 ```
-* example output:&nbsp;
+* example output:  
 ![service-relations-output](./media/service-relations-output.png)
 
 
@@ -216,7 +216,7 @@ kiali.getHtml('namespace');
 // to get the html for multiple namespaces
 kiali.getHtml(['namespace1', 'namespace2', 'namespace3'])
 ```
-* example output:&nbsp;
+* example output:  
 ![html-output](./media/html-output.png)
 
 ### getJson
