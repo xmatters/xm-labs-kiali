@@ -22,7 +22,7 @@ This document details how to install and use this integration.
 
 # Introduction - How it works
 Kiali is an addon to install with Istio, that works in conjunction with the Istio service mesh to cleanly display a graph of how your services are related. The Kiali library is meant to extend Kiali's functionality to xMatters, to allow xMatters users to quickly understand how certain services in their application are related to each other. This can be especially useful when certain services break or have a high rate of error, and developer would like to see how the service breaking may affect other parts of their application. When using other xMatters integrations to monitoring applications (for example: stackdriver), the Kiali library may be useful in pointing developers in the right direction towards fixing the problem. 
-&nbsp;
+<br/><br/>
 Kiali displays a graph of your microservices, with each service being a "Node", and each relation between services is an "Edge". Two services are related if they communicate with each other and have network traffic between them (e.g. via rest call). In this library, we have chosen to show relationships as either "Parent" relationships or "Children" relationships, where parents are where traffic originates (the source), and children are where traffic is directed (the target). Often times, when a service breaks or shows a high frequency of error, it may actually be due an error with the parent, and Kiali helps visualize this tendency in order to make debugging less confusing.
 
 - - - -
