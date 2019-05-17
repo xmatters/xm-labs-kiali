@@ -31,7 +31,7 @@ Kiali displays a graph of your microservices, with each service being a "Node", 
 ## Prerequisites
 1. A Communication Plan in xMatters 
 2. An application in kubernetes with Istio installed, and access to service names via inbound or outbound script in xMatters
-3. Have Kiali installed with Istio, and an exposed url that can be accessed to see the Kiali dashboard
+3. Have Kiali installed with Istio, and an exposed url that can be accessed to view the Kiali dashboard
 ## Kiali Library Set-up
 1. Locate your Communication Plan (xMatters > **DEVELOPER** tab), click **Edit** > **Integration Builder**
 2. Next to **Shared Libraries**, click Add
@@ -47,7 +47,9 @@ Kiali displays a graph of your microservices, with each service being a "Node", 
 - - - - 
 
 # Troubleshooting
-1. 
+1. If all kiali library methods are not working, check to verify that you have the correct endpoint with the same username and password you use to log in to `https://mytelemetrydomain.xyz:15029/kiali`
+2. If a specific Kiali library method is not working, for example `getServiceRelations`, check to verify you are entering a valid namespace, and if you are also getting details for a specific service, make sure that service is inside the namespace you are passing in to them method. You can verify this by running `kubectl get svc -n [namespace]`, replacing `[namespace]` with the namespace you are using, and make sure the service you are looking for is shown in that namespace
+3. If you have verified you are using the correct namespace and correct service name, make sure you have istio injection enabled in that namespace by checking `kubectl get namespaces --show-labels` shows the label `istio-injection=enabled` for the namespace you are using
 - - - -
 
 # Documentation
