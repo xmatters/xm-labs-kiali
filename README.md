@@ -21,104 +21,9 @@ This document details how to install and use this integration.
 * [inbound.js](./inbound.js) - This is an example inbound script that shows you how to call each method from the kiali library
 
 # Introduction - How it works
-Kiali is an addon to install with Istio, that works in conjunction with the Istio service mesh to cleanly display a graph of how your services are related. The Kiali library is meant to extend Kiali's functionality to xMatters, to allow xMatters users to quickly understand how certain services in their application are related to each other. This can be especially useful when certain services break or have a high rate of error, and developer would like to see how the service breaking may affect other parts of their application. When using other xMatters integrations to monitoring applications (for example: stackdrive), the Kiali library may be useful in pointing developers in the right direction towards fixing the problem. 
+Kiali is an addon to install with Istio, that works in conjunction with the Istio service mesh to cleanly display a graph of how your services are related. The Kiali library is meant to extend Kiali's functionality to xMatters, to allow xMatters users to quickly understand how certain services in their application are related to each other. This can be especially useful when certain services break or have a high rate of error, and developer would like to see how the service breaking may affect other parts of their application. When using other xMatters integrations to monitoring applications (for example: stackdriver), the Kiali library may be useful in pointing developers in the right direction towards fixing the problem. 
+&nbsp;
 Kiali displays a graph of your microservices, with each service being a "Node", and each relation between services is an "Edge". Two services are related if they communicate with each other and have network traffic between them (e.g. via rest call). In this library, we have chosen to show relationships as either "Parent" relationships or "Children" relationships, where parents are where traffic originates (the source), and children are where traffic is directed (the target). Often times, when a service breaks or shows a high frequency of error, it may actually be due an error with the parent, and Kiali helps visualize this tendency in order to make debugging less confusing.
-
-# Installation
-## Prerequisites:
-1. Must have [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) and [gcloud](https://cloud.google.com/sdk/install) command line tools, 
-2. A microserviced application deployed in kubernetes with Istio installed, for instructions on downloading and installing Istio, see [Downloading Istio](https://istio.io/docs/setup/kubernetes/download/) and [Customizable Install with Helm](https://istio.io/docs/setup/kubernetes/install/helm/)
-
-## Enabling Kiali in Istio
-Note: Istio has an updated guide on how to install Kiali [here](https://istio.io/docs/tasks/telemetry/kiali/), the steps are listed here for your convenience but for the most updated steps, use that link
-
-1. In the unix-based terminal, run the following commands to create a kiali username and password:
-```
-NAMESPACE=istio-system
-```
-```
-KIALI_USERNAME=$(read -p 'Kiali Username: ' uval && echo -n $uval | base64)
-```
-```
-KIALI_PASSPHRASE=$(read -sp 'Kiali Passphrase: ' pval && echo -n $pval | base64)
-```
-Note: if you use a different namespace for your istio installation, change istio-system to whatever you use
-
-2. Create a Kiali secret by running the following command:
-```
-cat <<EOF | kubectl apply -f -
-apiVersion: v1
-kind: Secret
-metadata:
-  name: kiali
-  namespace: $NAMESPACE
-  labels:
-    app: kiali
-type: Opaque
-data:
-  username: $KIALI_USERNAME
-  passphrase: $KIALI_PASSPHRASE
-EOF
-```
-3. Using the helm template you used to install Istio, add `--set kiali.enabled=true` as an option to the helm command, for example:
-```
-helm template install/kubernetes/helm/istio --set kiali.enabled=true --name istio --namespace istio-system > $HOME/istio.yaml
-kubectl apply -f $HOME/istio.yaml
-```
-4. Redeploy your application, 
-5. Run the following command to expose the Kiali endpoint to external traffic:
-```
-cat <<EOF | kubectl apply -f -
-apiVersion: networking.istio.io/v1alpha3
-kind: Gateway
-metadata:
-  name: kiali-gateway
-  namespace: istio-system
-spec:
-  selector:
-    istio: ingressgateway
-  servers:
-  - port:
-      number: 15029
-      name: http-kiali
-      protocol: HTTP
-    hosts:
-    - "*"
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: kiali-vs
-  namespace: istio-system
-spec:
-  hosts:
-  - "*"
-  gateways:
-  - kiali-gateway
-  http:
-  - match:
-    - port: 15029
-    route:
-    - destination:
-        host: kiali
-        port:
-          number: 20001
----
-apiVersion: networking.istio.io/v1alpha3
-kind: DestinationRule
-metadata:
-  name: kiali
-  namespace: istio-system
-spec:
-  host: kiali
-  trafficPolicy:
-    tls:
-      mode: DISABLE
----
-EOF
-```
-6. In [GKE](https://console.cloud.google.com/kubernetes/), click the **Services** tab, then you should see **istio-ingressgateway**; copy the endpoint with the `15029` port. 
-7. Navigate to `[endpoint]:15029/kiali` in a browser to make sure kiali is working properly (you should see a login screen), input the username and password you defined in the Kiali secret to explore Kiali
 
 - - - -
 
@@ -126,7 +31,7 @@ EOF
 ## Prerequisites
 1. A Communication Plan in xMatters 
 2. An application in kubernetes with Istio installed, and access to service names via inbound or outbound script in xMatters
-
+3. Have Kiali installed with Istio, and an exposed url that can be accessed to see the Kiali dashboard
 ## Kiali Library Set-up
 1. Locate your Communication Plan (xMatters > **DEVELOPER** tab), click **Edit** > **Integration Builder**
 2. Next to **Shared Libraries**, click Add
@@ -134,11 +39,16 @@ EOF
 4. Copy [The Script](./kiali.js), then click **Save** the library
 ![add-library](./media/add-library.png)
 5. Click `Edit Endpoints`, then click `Add Endpoint`
-6. Give the endpoint a descriptive name (e.g. Kiali), then change the Base URL to be the `:15029` endpoint (without the '/kiali' part). Add the username and password, then click **Save**
-7. Click `Edit Constants`, then click `Add Constant`, set the name to **Kiali Endpoint**, using the same URL and port as part (6)
-8. Add Kiali methods to other inbound/outbound scripts. See an example of how to call each method below
+6. Give the endpoint a descriptive name (e.g. Kiali), then change the Base URL to be the endpoint you use to access kiali (without the 'kiali' part). For example, if you view the kiali dashboard at `http://34.66.248.57:15029/kiali`, then your endpoint would be `http://34.66.248.57:15029/`. If it is `https://mytelemetrydomain.xyz:15029/kiali`, then your endpoint is `https://mytelemetrydomain.xyz:15029/`
+7. Add your Kiali username and password, then click **Save**
+8. Click `Edit Constants`, then click `Add Constant`, set the name to **Kiali Endpoint**, using the same URL and port as part (6)
+9. Add Kiali methods to other inbound/outbound scripts. See an example of how to call each method below
 
 - - - - 
+
+# Troubleshooting
+1. 
+- - - -
 
 # Documentation
 ### Notes
