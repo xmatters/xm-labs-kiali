@@ -42,6 +42,7 @@
  * Gets the Kiali graph as an HTML table with a row for each service, with a column
  * containing a list of parent services, and a column containing a list of children services
  * param namespaces: Single namespace (String) or list (Array) of namespaces to request a graph for
+ * param filterOn: A service name to filter the full graph on. Filters service name, parents and children
  * return: Returns the html of all services as a table
  *
  ***** kialiParser.getHtml = function(namespaces)
@@ -326,14 +327,15 @@ exports.getServiceDetails = function(namespaces, service) {
 };
 
 
-
 /*
+ * getHtml:
  * Gets the Kiali graph as an HTML table with a row for each service, with a column
  * containing a list of parent services, and a column containing a list of children services
  * param namespaces: Single namespace (String) or list (Array) of namespaces to request a graph for
+ * param filterOn: A service name to filter the full graph on. Filters service name, parents and children
  * return: Returns the html of all services as a table
- */
-exports.getHtml = function(namespaces) {
+*/
+exports.getHtml = function(namespaces, filterOn) {
     var elements = exports.getJson(namespaces).elements;
     var nodes = parseJson(elements);
     var html = '<table style="width:100%">\n';
@@ -342,46 +344,41 @@ exports.getHtml = function(namespaces) {
     html += '\t\t<th>Parents</th>\n';
     html += '\t\t<th>Children</th>\n';
     html += '\t</tr>\n';
+    var tmp;
+    
     for (node in nodes) {
-        html += '\t<tr>\n';
-        html += '\t\t<td>' + nodes[node].name + '</td>\n';
+        tmp = '\t<tr>\n';
+        tmp += '\t\t<td>' + nodes[node].name + '</td>\n';
         var parArr = [];
         for (var i in nodes[node].parents) {
             parArr.push(nodes[nodes[node].parents[i]].name);
         }
-        var parStr = "";
-        if (parArr.length !== 0) {
-            for (var i = 0; i < parArr.length; i ++) {
-                if (i === parArr.length - 1) {
-                    parStr += parArr[i];
-                } else {
-                    parStr += parArr[i] + ", ";
-                }
-            }
-        }
-        html += '\t\t<td>' + parStr + '</td>\n';
+        var parStr = parArr.join( ', ' );
+        
+        tmp += '\t\t<td>' + parStr + '</td>\n';
         var chArr = [];
         for (var i in nodes[node].children) {
             chArr.push(nodes[nodes[node].children[i]].name);
         }
-        var chStr = "";
-        if (chArr.length !== 0) {
-            for (var i = 0; i < chArr.length; i ++) {
-                if (i === chArr.length - 1) {
-                    chStr += chArr[i];
-                } else {
-                    chStr += chArr[i] + ", ";
-                }
-            }
-        }
-        html += '\t\t<td>' + chStr + '</td>\n';
-        html += '\t</tr>\n';
+        var chStr = chArr.join( ', ' );
+        
+        tmp += '\t\t<td>' + chStr + '</td>\n';
+        tmp += '\t</tr>\n';
+        
+        if( filterOn && ( 
+              nodes[node].name == filterOn || 
+              parArr.indexOf( filterOn ) > 0 ||
+              chArr.indexOf(  filterOn ) > 0 
+            ) )
+                html += tmp;
     }
     html += '</table>';
     return html;
 
     
 };
+
+
 
 
 
@@ -461,5 +458,4 @@ var parseJson = function(elements) {
     }
     return nodes;
 };
-
 
