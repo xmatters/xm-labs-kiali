@@ -27,7 +27,7 @@ Kiali displays a graph of your microservices, with each service being a "Node", 
 
 This is an example of using the `getHtml` function and including the output in a Prometheus notification:
 <kbd>
-   <img src="/media/prometheus-kiali.png" width=200>
+   <img src="/media/prometheus-kiali.png" width=450>
 </kbd>
 
 - - - -
