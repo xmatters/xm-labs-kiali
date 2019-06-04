@@ -25,6 +25,11 @@ Kiali is an addon to install with Istio, that works in conjunction with the Isti
 <br/><br/>
 Kiali displays a graph of your microservices, with each service being a "Node", and each relation between services is an "Edge". Two services are related if they communicate with each other and have network traffic between them (e.g. via rest call). In this library, we have chosen to show relationships as either "Parent" relationships or "Children" relationships, where parents are where traffic originates (the source), and children are where traffic is directed (the target). Often times, when a service breaks or shows a high frequency of error, it may actually be due an error with the parent, and Kiali helps visualize this tendency in order to make debugging less confusing.
 
+This is an example of using the `getHtml` function and including the output in a Prometheus notification:
+<kbd>
+   <img src="/media/prometheus-kiali.png" width=200>
+</kbd>
+
 - - - -
 
 # xMatters Integration Set-up:
