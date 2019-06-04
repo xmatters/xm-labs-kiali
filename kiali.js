@@ -419,7 +419,7 @@ exports.getJson = function(namespaces) {
  * return: The link (as a string) to the Kiali graph
  */
 exports.getLink = function() {
-    return constants['Kiali Endpoint'] + 'kiali/console/graph/namespaces?graphType=workload';
+    return constants['Kiali Endpoint'] + 'kiali/console/graph/namespaces?graphType=service';
 }
 
 
