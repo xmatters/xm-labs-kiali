@@ -7,13 +7,15 @@ This document details how to install and use this integration.
 ---------
 
 <kbd>
-<img src="https://github.com/xmatters/xMatters-Labs/raw/master/media/disclaimer.png">
+<a href="https://support.xmatters.com/hc/en-us/community/topics">
+   <img src="https://github.com/xmatters/xMatters-Labs/raw/master/media/disclaimer.png">
+</a>
 </kbd>
 
 ---------
 # Pre-Requisites
 * An application deployed in kubernetes broken up into microservices (via docker); see [here](https://istio.io/docs/examples/bookinfo/) for a basic example
-* A communication plan, and access to names of microservices from a script - could be applicable to a stackdriver integration, adding the service name into the xmatters inbound, then getting the service's relations when notifying someone
+* A workflow, and access to names of microservices from a script - could be applicable to a stackdriver integration, adding the service name into the xmatters inbound, then getting the service's relations when notifying someone
 * xMatters account - If you don't have one, [get one](https://www.xmatters.com)! 
 
 # Files
@@ -34,11 +36,11 @@ This is an example of using the `getHtml` function and including the output in a
 
 # xMatters Integration Set-up:
 ## Prerequisites
-1. A Communication Plan in xMatters 
+1. A workflow in xMatters 
 2. An application in kubernetes with Istio installed, and access to service names via inbound or outbound script in xMatters
 3. Have Kiali installed with Istio, and an exposed url that can be accessed to view the Kiali dashboard
 ## Kiali Library Set-up
-1. Locate your Communication Plan (xMatters > **DEVELOPER** tab), click **Edit** > **Integration Builder**
+1. Locate your workflow (xMatters > **Workflows** page), click **Edit** > **Integration Builder**
 2. Next to **Shared Libraries**, click Add
 3. Change the name to something descriptive, e.g. `Kiali`
 4. Copy [The Script](./kiali.js), then click **Save** the library
